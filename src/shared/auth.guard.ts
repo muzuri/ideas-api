@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, Catch} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -8,14 +8,25 @@ export class AuthGuard implements CanActivate {
   ): boolean | Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     if (!request.headers.authorization) {
-        return false;
+      return false;
     }
-    this.validateToken(request.headers.authorization);
+    // here in the tuto they are using await synchronization and you know this is not async function 
+    const decoded = this.validateToken(request.headers.authorization);
+    // console.log(decoded);
     return true;
   }
   async validateToken(auth: string) {
-    if (auth.split('')[0] !== 'Bearer') {// bearer token
-        throw new HttpException('Invalid token', HttpStatus.FORBIDDEN);
+    if (auth.split(' ')[0] !== 'Bearer') {// bearer token
+      throw new HttpException('Invalid token', HttpStatus.FORBIDDEN);
+    }
+    const token = auth.split(' ')[1];
+    try {
+      const decoded = await jwt.verify(token, process.env.SECRET);
+      return decoded;
+    } catch (err) {
+      const message = 'Token error:' + (err.message || err.name);
+      throw new HttpException(message, HttpStatus.FORBIDDEN);
+
     }
   }
 }
