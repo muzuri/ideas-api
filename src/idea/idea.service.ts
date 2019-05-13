@@ -14,14 +14,18 @@ export class IdeaService {
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
         ) { }
+        private toResponseObject(idea: IdeaEntity) {
+           return {...idea, author: idea.author.toResponseObject()} ;
+        }
 
     async  showAllIdeas() {
         return await this.ideaRepository.find({relations: ['author']});
     }
-    async createIdea(data: IdeaDTO) {
-        const idea = await this.ideaRepository.create(data);
+    async createIdea(userId: string, data: IdeaDTO) {
+        const user = await this.userRepository.findOne({where: {id: userId}});
+        const idea = await this.ideaRepository.create({...data, author: user});
         await this.ideaRepository.save(idea);
-        return idea;
+        return this.toResponseObject(idea);
     }
 
     async readById(id: string) {

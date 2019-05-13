@@ -33,7 +33,7 @@ export class ValidationPipe implements PipeTransform<any> {
             .map(err => {
                 for (let p in err.constraints) {
                     return err.constraints[p];
-                }
+                } 
             }).join('');
     }
     private isEmpty(value: any) {

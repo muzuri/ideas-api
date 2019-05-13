@@ -11,7 +11,8 @@ export class UserController {
 
     @Get('api/users')
     @UseGuards(new AuthGuard())
-    showAllUsers() {
+    showAllUsers(@User() user) {
+        console.log(user);
         return this.userService.showAll();
     }
     @Post('api/login')

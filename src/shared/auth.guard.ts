@@ -8,11 +8,12 @@ export class AuthGuard implements CanActivate {
   ): boolean | Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     if (!request.headers.authorization) {
+      console.log('this is not valid');
       return false;
     }
     // here in the tuto they are using await synchronization and you know this is not async function 
-    const decoded = this.validateToken(request.headers.authorization);
-    // console.log(decoded);
+    request.user = this.validateToken(request.headers.authorization);
+    //  console.log(decoded);
     return true;
   }
   async validateToken(auth: string) {
