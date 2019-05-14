@@ -30,8 +30,8 @@ export class IdeaController {
     @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
     createIdea(@User('id') user, @Body() data: IdeaDTO) {
-        this.logData({user, data});
-        // this.logger.log(JSON.stringify(data));
+        // this.logData({user, data});
+        this.logger.log(JSON.stringify(data));
         return this.ideaService.createIdea(user, data);
     }
 

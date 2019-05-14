@@ -29,7 +29,7 @@ export class UserEntity {
 
     toResponseObject(showToken: boolean = true): userRO {
         const { id, created, username, token } = this;
-        const responseObject: any = { id, created, username, token};
+        const responseObject: any = { id, created, username};
         if (showToken) {
             responseObject.token = token;
         }
@@ -47,3 +47,6 @@ export class UserEntity {
     }
 
 }
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1MWUzNmJjLTRlNT
+// ctNGU3MS1iYWEzLTExNjkyZTBiODI4ZCIsInVzZXJuYW1lIjoiZGF2aWQ
+// iLCJpYXQiOjE1NTc3NjEzMTcsImV4cCI6MTU1ODM2NjExN30.1Y2GjQpUX0CqdaQpQ7vlhLGtTAw3-dG49s3HCceYCag

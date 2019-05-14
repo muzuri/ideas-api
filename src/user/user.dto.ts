@@ -10,6 +10,7 @@ export class UserDto {
 
 export class userRO {
     id: string;
+    updated: string;
     userName: string;
     created: Date;
     token?:string;
