@@ -14,7 +14,9 @@ export class IdeaEntity {
     @Column('text')
     idea: string;
 
-    @Column('text') description: string;
+    @Column('text')
+    description: string;
+
     @ManyToOne(type => UserEntity, author => author.ideas)
     author: UserEntity;
 

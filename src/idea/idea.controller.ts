@@ -30,21 +30,24 @@ export class IdeaController {
     @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
     createIdea(@User('id') user, @Body() data: IdeaDTO) {
-        // this.logData({user, data});
-        this.logger.log(JSON.stringify(data));
+        this.logData({ user, data });
+        // this.logger.log(JSON.stringify(data));
         return this.ideaService.createIdea(user, data);
     }
 
     @Put(':id')
+    @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
-    updateIdea(@Param('id') id: string, @Body() data: Partial<IdeaDTO>) {
-        this.logger.log(JSON.stringify(data));
-        return this.ideaService.update(id, data);
+    updateIdea(@Param('id') id: string, @User('id') user: string, @Body() data: Partial<IdeaDTO>) {
+        this.logData({ id, user, data });
+        // this.logger.log(JSON.stringify(data));
+        return this.ideaService.update(id, user, data);
     }
 
     @Delete(':id')
-    deleteIdea(@Param('id') id: string) {
-
-        return this.ideaService.deleteIdea(id);
+    @UseGuards(new AuthGuard())
+    deleteIdea(@Param('id') id: string, @User('id') user) {
+        this.logData({ id, user });
+        return this.ideaService.deleteIdea(id, user);
     }
 }

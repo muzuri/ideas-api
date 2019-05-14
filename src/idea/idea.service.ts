@@ -18,6 +18,11 @@ export class IdeaService {
 
         return { ...idea, author: idea.author.toResponseObject(true) };
     }
+    private ensureOwneship(idea: IdeaEntity, userId: string) {
+        if (idea.author.id !== userId) {
+            throw new HttpException('incorrect', HttpStatus.UNAUTHORIZED);
+        }
+    }
 
     async  showAllIdeas(): Promise<IdeaRo[]> {
         const ideas = await this.ideaRepository.find({ relations: ['author'] });
@@ -31,27 +36,30 @@ export class IdeaService {
     }
 
     async readById(id: string): Promise<IdeaRo> {
-        const idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author'] });
+        const idea = await this.ideaRepository.findOne({ where: { id },
+            relations: ['author'] });
         if (!idea) {
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
         }
         return this.toResponseObject(idea);
     }
     // we are going to use dto partial because user will not always update all
-    async update(id: string, data: Partial<IdeaDTO>): Promise<IdeaRo> {
-        let idea = await this.ideaRepository.findOne({ where: { id } });
+    async update(id: string, userId: string, data: Partial<IdeaDTO>): Promise<IdeaRo> {
+        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author'] });
         if (!idea) {
             throw new HttpException('Not found any data', HttpStatus.NOT_FOUND);
         }
+        this.ensureOwneship(idea, userId);
         await this.ideaRepository.update({ id }, data);
-        idea = await this.ideaRepository.findOne({ where: { id } });
+        idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author']});
         return this.toResponseObject(idea);
     }
-    async   deleteIdea(id: string) {
-        const idea = await this.ideaRepository.findOne({ where: { id } });
+    async  deleteIdea(id: string, userId: string) {
+        const idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author'] });
         if (!idea) {
             throw new HttpException('Not ready for deleted ', HttpStatus.NOT_FOUND);
         }
+        this.ensureOwneship(idea, userId);
         await this.ideaRepository.delete({ id });
         return { deleted: true };
     }
