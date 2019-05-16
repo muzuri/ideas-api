@@ -3,16 +3,16 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  canActivate(
+  async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> {
+  ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     if (!request.headers.authorization) {
       console.log('this is not valid');
       return false;
     }
     // here in the tuto they are using await synchronization and you know this is not async function 
-    request.user = this.validateToken(request.headers.authorization);
+    request.user = await this.validateToken(request.headers.authorization);
     //  console.log(decoded);
     return true;
   }

@@ -11,7 +11,7 @@ export class UserController {
 
     @Get('api/users')
     @UseGuards(new AuthGuard())
-    showAllUsers(@User() user) {
+    showAllUsers(@User('id') user) {
         console.log(user);
         return this.userService.showAll();
     }
@@ -22,7 +22,6 @@ export class UserController {
 
     }
     @Post('register')
-    // @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
     register(@Body() data: UserDto) {
         return this.userService.register(data);

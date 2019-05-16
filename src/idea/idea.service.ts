@@ -16,7 +16,7 @@ export class IdeaService {
     ) { }
     private toResponseObject(idea: IdeaEntity): IdeaRo {
 
-        return { ...idea, author: idea.author.toResponseObject(true) };
+        return { ...idea, author: idea.author.toResponseObject(false) };
     }
     private ensureOwneship(idea: IdeaEntity, userId: string) {
         if (idea.author.id !== userId) {
