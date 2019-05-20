@@ -31,7 +31,6 @@ export class IdeaController {
     @UsePipes(new ValidationPipe())
     createIdea(@User('id') user, @Body() data: IdeaDTO) {
         this.logData({ user, data });
-        // this.logger.log(JSON.stringify(data));
         return this.ideaService.createIdea(user, data);
     }
 
@@ -49,5 +48,18 @@ export class IdeaController {
     deleteIdea(@Param('id') id: string, @User('id') user) {
         this.logData({ id, user });
         return this.ideaService.deleteIdea(id, user);
+    }
+    @Post(':id/bookmark')
+    @UseGuards(new AuthGuard())
+    bookmark(@Param('id') id: string, @User('id') user) {
+        this.logData({ user, id });
+        return this.ideaService.bookmark(id, user);
+    }
+    @Delete(':id/bookmark')
+    @UseGuards(new AuthGuard())
+    Unbookmark(@Param('id') id: string, @User('id') userId: string) {
+        this.logData({ id, userId });
+        return this.ideaService.ubookmark(id, userId);
+
     }
 }

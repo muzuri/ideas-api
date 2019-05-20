@@ -15,8 +15,14 @@ export class IdeaService {
         private userRepository: Repository<UserEntity>,
     ) { }
     private toResponseObject(idea: IdeaEntity): IdeaRo {
-
-        return { ...idea, author: idea.author.toResponseObject(false) };
+        const responseObject: any = { ...idea, author: idea.author.toResponseObject(false) };
+        if (responseObject.upvotes) {
+            responseObject.upvotes = idea.upvotes.length;
+        }
+        if (responseObject.downvotes) {
+            responseObject.downvotes = idea.downvotes.length;
+        }
+        return responseObject;
     }
     private ensureOwneship(idea: IdeaEntity, userId: string) {
         if (idea.author.id !== userId) {
@@ -25,7 +31,7 @@ export class IdeaService {
     }
 
     async  showAllIdeas(): Promise<IdeaRo[]> {
-        const ideas = await this.ideaRepository.find({ relations: ['author'] });
+        const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes'] });
         return ideas.map(idea => this.toResponseObject(idea));
     }
     async createIdea(userId: string, data: IdeaDTO): Promise<IdeaRo> {
@@ -36,8 +42,10 @@ export class IdeaService {
     }
 
     async readById(id: string): Promise<IdeaRo> {
-        const idea = await this.ideaRepository.findOne({ where: { id },
-            relations: ['author'] });
+        const idea = await this.ideaRepository.findOne({
+            where: { id },
+            relations: ['author']
+        });
         if (!idea) {
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
         }
@@ -51,7 +59,7 @@ export class IdeaService {
         }
         this.ensureOwneship(idea, userId);
         await this.ideaRepository.update({ id }, data);
-        idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author']});
+        idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author'] });
         return this.toResponseObject(idea);
     }
     async  deleteIdea(id: string, userId: string) {
@@ -62,5 +70,31 @@ export class IdeaService {
         this.ensureOwneship(idea, userId);
         await this.ideaRepository.delete({ id });
         return { deleted: true };
+    }
+    async bookmark(id: string, userId: string) {
+        const idea = await this.ideaRepository.findOne({ where: { id } });
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: ['bookmarks']
+
+        });
+
+        if (user.bookmarks.filter(bookmark => bookmark.id === idea.id).length < 1) {
+            user.bookmarks.push(idea);
+            await this.userRepository.save(user);
+        } else {
+            throw new HttpException('idea already bookmarked', HttpStatus.BAD_REQUEST);
+        }
+        return user.toResponseObject();
+    }
+    async ubookmark(id: string, userId: string) {
+        const idea = await this.ideaRepository.findOne({ where: { id } });
+        const user = await this.userRepository.findOne({ where: { id: userId} , relations: ['bookmarks'] });
+        if (user.bookmarks.filter(bookmarks => bookmarks.id === idea.id).length > 0) {
+        user.bookmarks = user.bookmarks.filter(bookmarks => bookmarks.id !== idea.id);
+        await this.userRepository.save(user);
+        } else {
+            throw new HttpException('not yet booked ', HttpStatus.BAD_REQUEST);
+        }
     }
 }

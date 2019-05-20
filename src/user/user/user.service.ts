@@ -10,7 +10,7 @@ export class UserService {
     private userRepository: Repository<UserEntity>) { }
 
     async showAll(): Promise<userRO[]> {
-        const users = await this.userRepository.find({relations: ['ideas']});
+        const users = await this.userRepository.find({relations: ['ideas', 'bookmarks']});
         return users.map(user => user.toResponseObject(false));
     }
 
@@ -38,5 +38,4 @@ export class UserService {
         return user.toResponseObject();
 
     }
-    
 }
