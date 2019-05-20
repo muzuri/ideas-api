@@ -5,9 +5,12 @@ import { IdeaEntity } from './idea.entity';
 // import { IdeaModel } from './idea.model';
 import { IdeaDTO, IdeaRo } from './idea.dto';
 import { UserEntity } from 'src/user/user.entity';
+import { Votes } from 'src/shared/votes.enum';
+import { ValidationError } from 'class-validator';
 
 @Injectable()
 export class IdeaService {
+    cars: string[] = ['e', ''];
     constructor(
         @InjectRepository(IdeaEntity)
         private ideaRepository: Repository<IdeaEntity>,
@@ -29,6 +32,22 @@ export class IdeaService {
             throw new HttpException('incorrect', HttpStatus.UNAUTHORIZED);
         }
     }
+    private async vote(idea: IdeaEntity, user: UserEntity, vote: Votes) {
+        const opposite = vote === Votes.UP ? Votes.DOWN : Votes.UP;
+        if (idea[opposite].filter(voter => voter.id === user.id).length > 0 ||
+            idea[vote].filter(voter => voter.id === user.id).length > 0) {
+            idea[opposite] = idea[opposite].filter(voter => voter.id !== user.id);
+            idea[vote] = idea[vote].filter(voter => voter.id !== user.id);
+            await this.ideaRepository.save(idea);
+        } else if (idea[vote].filter(voter => voter.id === user.id)) {
+            idea[vote].push(user);
+            await this.ideaRepository.save(idea);
+
+        } else {
+            throw new HttpException('unable to cast vote', HttpStatus.BAD_REQUEST);
+        }
+        return idea;
+    }
 
     async  showAllIdeas(): Promise<IdeaRo[]> {
         const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes'] });
@@ -44,7 +63,7 @@ export class IdeaService {
     async readById(id: string): Promise<IdeaRo> {
         const idea = await this.ideaRepository.findOne({
             where: { id },
-            relations: ['author']
+            relations: ['author', 'downvotes', 'upvotes']
         });
         if (!idea) {
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -89,12 +108,25 @@ export class IdeaService {
     }
     async ubookmark(id: string, userId: string) {
         const idea = await this.ideaRepository.findOne({ where: { id } });
-        const user = await this.userRepository.findOne({ where: { id: userId} , relations: ['bookmarks'] });
+        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['bookmarks'] });
         if (user.bookmarks.filter(bookmarks => bookmarks.id === idea.id).length > 0) {
-        user.bookmarks = user.bookmarks.filter(bookmarks => bookmarks.id !== idea.id);
-        await this.userRepository.save(user);
+            user.bookmarks = user.bookmarks.filter(bookmarks => bookmarks.id !== idea.id);
+            await this.userRepository.save(user);
         } else {
             throw new HttpException('not yet booked ', HttpStatus.BAD_REQUEST);
         }
     }
+    async upvote(id: string, userId: string) {
+        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author', 'upvotes', 'downvotes'] });
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+        idea = await this.vote(idea, user, Votes.UP);
+        return this.toResponseObject(idea);
+    }
+    async downvote(id: string, userId: string) {
+        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['downvotes', 'upvotes', 'author'] });
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+        idea = await this.vote(idea, user, Votes.DOWN);
+        return this.toResponseObject(idea);
+    }
 }
+// 051e36bc-4e57-4e71-baa3-11692e0b828d
