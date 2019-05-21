@@ -50,7 +50,7 @@ export class IdeaService {
     }
 
     async  showAllIdeas(): Promise<IdeaRo[]> {
-        const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes'] });
+        const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes', 'comments'] });
         return ideas.map(idea => this.toResponseObject(idea));
     }
     async createIdea(userId: string, data: IdeaDTO): Promise<IdeaRo> {
@@ -63,7 +63,7 @@ export class IdeaService {
     async readById(id: string): Promise<IdeaRo> {
         const idea = await this.ideaRepository.findOne({
             where: { id },
-            relations: ['author', 'downvotes', 'upvotes']
+            relations: ['author', 'downvotes', 'upvotes', 'comments'],
         });
         if (!idea) {
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -78,7 +78,7 @@ export class IdeaService {
         }
         this.ensureOwneship(idea, userId);
         await this.ideaRepository.update({ id }, data);
-        idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author'] });
+        idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author', 'comments'] });
         return this.toResponseObject(idea);
     }
     async  deleteIdea(id: string, userId: string) {
@@ -117,13 +117,13 @@ export class IdeaService {
         }
     }
     async upvote(id: string, userId: string) {
-        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author', 'upvotes', 'downvotes'] });
+        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author', 'upvotes', 'downvotes', 'comments'] });
         const user = await this.userRepository.findOne({ where: { id: userId } });
         idea = await this.vote(idea, user, Votes.UP);
         return this.toResponseObject(idea);
     }
     async downvote(id: string, userId: string) {
-        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['downvotes', 'upvotes', 'author'] });
+        let idea = await this.ideaRepository.findOne({ where: { id }, relations: ['downvotes', 'upvotes', 'author', 'comments'] });
         const user = await this.userRepository.findOne({ where: { id: userId } });
         idea = await this.vote(idea, user, Votes.DOWN);
         return this.toResponseObject(idea);
