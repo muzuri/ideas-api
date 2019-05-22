@@ -6,7 +6,6 @@ import { IdeaEntity } from './idea.entity';
 import { IdeaDTO, IdeaRo } from './idea.dto';
 import { UserEntity } from 'src/user/user.entity';
 import { Votes } from 'src/shared/votes.enum';
-import { ValidationError } from 'class-validator';
 
 @Injectable()
 export class IdeaService {
@@ -49,8 +48,11 @@ export class IdeaService {
         return idea;
     }
 
-    async  showAllIdeas(): Promise<IdeaRo[]> {
-        const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes', 'comments'] });
+    async  showAllIdeas(page: number = 1): Promise<IdeaRo[]> {
+        const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes', 'comments'],
+    take: 3,
+    skip: 3 * (page - 1 ),
+    });
         return ideas.map(idea => this.toResponseObject(idea));
     }
     async createIdea(userId: string, data: IdeaDTO): Promise<IdeaRo> {
