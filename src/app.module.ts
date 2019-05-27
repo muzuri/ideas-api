@@ -8,7 +8,7 @@ import { HttpErrorFilter } from './shared/http-error.filter';
 import { LOggingInterceptor } from './shared/logging.interceptor';
 import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
-import {GraphQLModule} from '@nestjs/graphql';
+import { GraphQLModule } from '@nestjs/graphql';
 
 @Module({
   imports: [TypeOrmModule.forRoot(),
@@ -16,12 +16,17 @@ import {GraphQLModule} from '@nestjs/graphql';
     typePaths: ['./**/*.graphql'],
   },
   ),
-  IdeaModule, UserModule, CommentModule],
+    IdeaModule,
+    UserModule,
+    CommentModule,
+  ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_FILTER,
-    useClass: HttpErrorFilter,
-  },
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpErrorFilter,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: LOggingInterceptor,
