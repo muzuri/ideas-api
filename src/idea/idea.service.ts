@@ -49,12 +49,15 @@ export class IdeaService {
     }
 
     async  showAllIdeas(page: number = 1): Promise<IdeaRo[]> {
-        const ideas = await this.ideaRepository.find({ relations: ['author', 'upvotes', 'downvotes', 'comments'],
+        const ideas = await this.ideaRepository.find({
+    relations: ['author', 'upvotes', 'downvotes', 'comments'],
     take: 3,
     skip: 3 * (page - 1 ),
+
     });
         return ideas.map(idea => this.toResponseObject(idea));
     }
+
     async createIdea(userId: string, data: IdeaDTO): Promise<IdeaRo> {
         const user = await this.userRepository.findOne({ where: { id: userId } });
         const idea = await this.ideaRepository.create({ ...data, author: user });
