@@ -7,6 +7,6 @@ const port = process.env.PORT || 8000;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(port);
-  Logger.log(`server runnuing on port http://localhost:${port}`, 'Boostrap');
+  Logger.log(`server running on port http://localhost:${port}`, 'Boostrap');
 }
 bootstrap();
