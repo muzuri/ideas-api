@@ -1,8 +1,10 @@
-import { Resolver, Query, Args, ResolveProperty, Parent, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, ResolveProperty, Parent, Mutation, Context } from '@nestjs/graphql';
 import { UserService } from './user/user.service';
 import { CommentService } from 'src/comment/comment/comment.service';
 import { UserDto } from './user.dto';
-
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/shared/auth.guard';
+import { async } from 'rxjs/internal/scheduler/async';
 @Resolver('User')
 export class UserResolver {
     constructor(private userService: UserService,
@@ -12,15 +14,29 @@ export class UserResolver {
     Users(@Args('page') page: number) {
         return this.userService.showAll(page);
     }
+    @Query()
+    user(@Args('username') username: string) {
+        return this.userService.read(username);
+    }
+    @Query()
+    @UseGuards(new AuthGuard())
+    whoami(@Context('user') user) {
+        const {username} = user;
+
+        return this.userService.read(username);
+    }
+
     @Mutation()
-    login(@Args('username') username: string, @Args('password') password: string) {
+    async login(@Args('username') username: string, @Args('password') password: string) {
         const user: UserDto = { username, password };
-        return this.userService.login(user);
+        return await this.userService.login(user);
     }
     @Mutation()
-    register(@Args() { username, password }) {
+    async register(@Args('username') username: string,
+                   @Args('password') password: string,
+    ) {
         const user: UserDto = { username, password };
-        return this.userService.register(user);
+        return await this.userService.register(user);
     }
 
     @ResolveProperty()

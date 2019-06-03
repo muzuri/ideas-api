@@ -14,6 +14,9 @@ type Auth {
 }
 type Query{
     Users(page: Int): [User!]
+    user(username: String!): User
+    whoami: User
+    
 }
 type Mutation {
   login(username: String!, password: String!): Auth!

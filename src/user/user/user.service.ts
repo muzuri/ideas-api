@@ -30,6 +30,10 @@ export class UserService {
         }
         return user.toResponseObject();
     }
+    async read(username: string) {
+      const user = await this.userRepository.findOne({where: {username}, relations: ['ideas', ' bookmarks']});
+      return user.toResponseObject(false);
+    }
 
     async register(data: UserDto): Promise<userRO> {
         const { username } = data;
@@ -44,3 +48,7 @@ export class UserService {
 
     }
 }
+//  {
+//    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjNhYTE1YzIzLTJkOGItNDM3Ny05N2MzLTUxMDg5NTRkOTE5MSIsInVzZXJuYW1lIjoibXV0YXRpbmEgIiwiaWF0IjoxNTU5MTI0OTcwLCJleHAiOjE1NTk3Mjk3NzB9.DHYYllGLu2Kobp4XFc4K1kvmVIxbx9dqM7CsBrrROUE"
+//   }
+  // username: mutatina

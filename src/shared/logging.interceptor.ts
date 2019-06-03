@@ -16,7 +16,7 @@ export class LOggingInterceptor implements NestInterceptor {
             const method = req.method;
             const url = req.url;
             return next.handle().pipe(
-                tap(() => Logger.log(`${method} ${url} ${Date.now() - now}ms`, context.getClass().name))
+                tap(() => Logger.log(`${method} ${url} ${Date.now() - now}ms`, context.getClass().name)),
             );
         } else {
             const ctx: any = GqlExecutionContext.create(context);
