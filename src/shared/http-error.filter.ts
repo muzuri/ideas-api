@@ -1,9 +1,12 @@
-import { Catch, ExceptionFilter, HttpException, ArgumentsHost, Logger, HttpStatus } from '@nestjs/common';
+import { Catch, HttpException, ArgumentsHost, Logger, HttpStatus } from '@nestjs/common';
+import { GqlExceptionFilter, GqlArgumentsHost } from '@nestjs/graphql';
+
 
 @Catch()
-export class HttpErrorFilter implements ExceptionFilter {
+export class HttpErrorFilter implements GqlExceptionFilter {
     catch(exception: HttpException, host: ArgumentsHost) {
-        const ctx = host.switchToHttp();
+        const gqlHost = GqlArgumentsHost.create(host);
+        const ctx = gqlHost.switchToHttp();
         const request = ctx.getRequest();
         const response = ctx.getResponse();
         const status = exception.getStatus ? exception.getStatus() :
@@ -20,6 +23,8 @@ export class HttpErrorFilter implements ExceptionFilter {
         }
         Logger.error(`${request.method} ${request.url}`, JSON.stringify(errorResponse), 'ExceptionFilter');
         response.status(status).json(errorResponse);
+
+        return exception;
 
     }
 }

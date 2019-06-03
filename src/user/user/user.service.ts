@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user.entity';
 import { Repository } from 'typeorm';
 import { UserDto, userRO } from '../user.dto';
+import { User } from '../user.decorator';
 
 @Injectable()
 export class UserService {
@@ -30,9 +31,9 @@ export class UserService {
         }
         return user.toResponseObject();
     }
-    async read(username: string) {
-      const user = await this.userRepository.findOne({where: {username}, relations: ['ideas', ' bookmarks']});
-      return user.toResponseObject(false);
+    async read(idNumber: number) {
+        const user = await this.userRepository.findOne({ where: { id: idNumber }, relations: ['ideas', ' bookmarks'] });
+        return user.toResponseObject(false);
     }
 
     async register(data: UserDto): Promise<userRO> {
@@ -45,6 +46,10 @@ export class UserService {
         user = await this.userRepository.create(data);
         await this.userRepository.save(user);
         return user.toResponseObject();
+
+    }
+    async findOne(@User('firstname') firstname: string) {
+        console.log(firstname);
 
     }
 }
