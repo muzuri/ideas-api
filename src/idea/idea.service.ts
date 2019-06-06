@@ -28,7 +28,7 @@ export class IdeaService {
     }
     private ensureOwneship(idea: IdeaEntity, userId: string) {
         if (idea.author.id !== userId) {
-            throw new HttpException('incorrect', HttpStatus.UNAUTHORIZED);
+            throw new HttpException('incorrect user', HttpStatus.UNAUTHORIZED);
         }
     }
     private async vote(idea: IdeaEntity, user: UserEntity, vote: Votes) {
@@ -89,7 +89,7 @@ export class IdeaService {
     async  deleteIdea(id: string, userId: string) {
         const idea = await this.ideaRepository.findOne({ where: { id }, relations: ['author'] });
         if (!idea) {
-            throw new HttpException('Not ready for deleted ', HttpStatus.NOT_FOUND);
+            throw new HttpException('No Data found ', HttpStatus.NOT_FOUND);
         }
         this.ensureOwneship(idea, userId);
         await this.ideaRepository.delete({ id });
@@ -99,7 +99,7 @@ export class IdeaService {
         const idea = await this.ideaRepository.findOne({ where: { id } });
         const user = await this.userRepository.findOne({
             where: { id: userId },
-            relations: ['bookmarks']
+            relations: ['bookmarks'],
 
         });
 
@@ -134,4 +134,3 @@ export class IdeaService {
         return this.toResponseObject(idea);
     }
 }
-// 051e36bc-4e57-4e71-baa3-11692e0b828d
