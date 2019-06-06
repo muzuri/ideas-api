@@ -4,7 +4,6 @@ import { CommentService } from 'src/comment/comment/comment.service';
 import { UserDto } from './user.dto';
 import { UseGuards, ParseIntPipe } from '@nestjs/common';
 import { AuthGuard } from 'src/shared/auth.guard';
-import { async } from 'rxjs/internal/scheduler/async';
 @Resolver('User')
 export class UserResolver {
     constructor(private userService: UserService,
@@ -14,10 +13,10 @@ export class UserResolver {
     Users(@Args('page') page: number) {
         return this.userService.showAll(page);
     }
-    // @Query()
-    // user(@Args('username') username: string) {
-    //     return this.userService.read(username);
-    // }
+    @Query()
+    user(@Args('username') username: string) {
+        return this.userService.read(username);
+    }
     @Query()
     @UseGuards(new AuthGuard())
     whoami(@Context('user') user) {
@@ -25,11 +24,11 @@ export class UserResolver {
 
         return this.userService.read(username);
     }
-    @Query()
-    @UseGuards(new AuthGuard())
-     async Author(@Args('id', ParseIntPipe) id: number) {
- return  await this.userService.read(id);
-}
+//     @Query()
+//     @UseGuards(new AuthGuard())
+//      async Author(@Args('id', ParseIntPipe) id: number) {
+//  return  await this.userService.read(id);
+// }
 
     @Mutation()
     async login(@Args('username') username: string, @Args('password') password: string) {

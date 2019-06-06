@@ -10,7 +10,9 @@ export class CommentController {
     constructor(private commentService: CommentService) { }
     @Get()
     @UseGuards(new AuthGuard())
-    showAllComments() {}
+    showAllComments() {
+        return this.commentService.showAll();
+    }
     @Get('idea/:id')
     @UseGuards(new AuthGuard())
     showCommentByIdea(@Param('id') id: string, @Query('page') page: number) {

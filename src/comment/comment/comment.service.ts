@@ -24,6 +24,9 @@ export class CommentService {
         }
         return responseObject;
     }
+    async showAll(){
+        return this.commentRepository.find();
+    }
 
     async showComment(id: string) {
         const comment = await this.commentRepository.findOne({ where: { id }, relations: ['author', 'idea'] });
@@ -41,7 +44,7 @@ export class CommentService {
     async destroy(id: string, userId: string) {
         const comment = await this.commentRepository.findOne({
             where: { id },
-            relations: ['author', 'idea']
+            relations: ['author', 'idea'],
         });
 
         if (comment.author.id !== userId) {

@@ -24,10 +24,10 @@ import { GraphQLModule } from '@nestjs/graphql';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_FILTER,
-      useClass: HttpErrorFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: HttpErrorFilter,
+    // },
     {
       provide: APP_INTERCEPTOR,
       useClass: LOggingInterceptor,
