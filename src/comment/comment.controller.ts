@@ -21,7 +21,7 @@ export class CommentController {
     }
 
     @Get('user/:id')
-   //  @UseGuards(new AuthGuard())
+    @UseGuards(new AuthGuard())
     showCommentByUser(@Param('id') id: string, @Query('page') page: number) {
 
         return this.commentService.showByUser(id, page);

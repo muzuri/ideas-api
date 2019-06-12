@@ -6,7 +6,7 @@ import { AuthGuard } from 'src/shared/auth.guard';
 import { User } from 'src/user/user.decorator';
 
 
-@Controller('api/idea')
+@Controller('api/ideas')
 export class IdeaController {
     private logger = new Logger('IdeaController');
     constructor(private ideaService: IdeaService) { }

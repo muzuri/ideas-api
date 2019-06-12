@@ -1,9 +1,10 @@
-import { Controller, Post, Get, Body, UsePipes, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, UsePipes, UseGuards, Query, Param } from '@nestjs/common';
 import { UserService } from './user/user.service';
 import { UserDto } from './user.dto';
 import { ValidationPipe } from 'src/shared/validation.pipe';
 import { AuthGuard } from 'src/shared/auth.guard';
 import { User } from './user.decorator';
+import { get } from 'https';
 
 @Controller()
 export class UserController {
@@ -21,9 +22,18 @@ export class UserController {
         return this.userService.login(data);
 
     }
-    @Post('register')
+    @Post('api/register')
     @UsePipes(new ValidationPipe())
     register(@Body() data: UserDto) {
         return this.userService.register(data);
+    }
+    @Get('api/whoami')
+    @UseGuards(new AuthGuard())
+    async showMe(@User('username') username: string){
+        return this.userService.read(username);
+    }
+    @Get('api/users/:username')
+    showOneUser(@Param('username') username: string) {
+        return this.userService.read(username);
     }
 }

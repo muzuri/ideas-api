@@ -9,6 +9,7 @@ import { LOggingInterceptor } from './shared/logging.interceptor';
 import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
 import { GraphQLModule } from '@nestjs/graphql';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot(),
@@ -20,6 +21,7 @@ import { GraphQLModule } from '@nestjs/graphql';
     IdeaModule,
     UserModule,
     CommentModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
